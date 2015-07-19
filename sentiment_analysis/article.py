@@ -12,22 +12,22 @@ def readVocabulary(input, s):
             s.add(word)
 
 
-def processArticle(input, output, skipFirst=True):
-    print(output)
+def processArticle(input, html, txt, skipFirst=True):
+    print(html)
     fin = open(input, 'r')
-    fout = open(output, 'w')
-    fout.write("""
+    fhtml = open(html, 'w')
+    ftxt = open(txt, 'w')
+    fhtml.write("""
 <!DOCTYPE html>
 <html>
 <head>
 <title>%s</title>
 <meta charset="utf-8">
-<link href='http://fonts.useso.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
 <style type="text/css">
 p {
-    font-family: Vollkorn, serif;
+    font-family: Palatino, serif;
     line-height: 1.25em;
-    margin: 0.2em 0;
+    margin: 0.3em 0;
 }
 
 .positive { background-color: #AA3939; color: #FFF; }
@@ -38,7 +38,7 @@ p {
 <h1>%s</h1>""" % (input, input))
     start = 1 if skipFirst else 0
     for line in fin:
-        fout.write('<p>')
+        fhtml.write('<p>')
         for triple in line.rstrip('\n').split(' ')[start:]:
             try:
                 word, root, wclass = triple.split('/')
@@ -48,17 +48,20 @@ p {
                     css = "negative"
                 else:
                     css = ""
-                fout.write('<span class="%s" title="%s">%s</span> ' % (css, triple, word))
+                fhtml.write('<span class="%s" title="%s">%s</span> ' % (css, triple, word))
+                ftxt.write('%s ' % word)
                 if wclass not in wordClasses:
                     wordClasses[wclass] = triple
             except:
                 print('    skip triple:', triple)
-        fout.write('</p>\n')
-    fout.write('''
+        fhtml.write('</p>\n')
+        ftxt.write('\n')
+    fhtml.write('''
 </body>
 </html>''')
     fin.close()
-    fout.close()
+    fhtml.close()
+    ftxt.close()
 
 def printWordClasses(output):
     print(output)
@@ -70,11 +73,11 @@ def printWordClasses(output):
 readVocabulary('inputs/positive-words.txt', positiveWords)
 readVocabulary('inputs/negative-words.txt', negativeWords)
 
-processArticle('inputs/blender_sentences.txt', 'outputs/blender_sentences.html', False)
-processArticle('inputs/drill_POS.txt', 'outputs/drill_POS.html')
-processArticle('inputs/fridge_ann.txt', 'outputs/fridge_ann.html')
-processArticle('inputs/movies_ann.txt', 'outputs/movies_ann.html')
-processArticle('inputs/vacuum_ann.txt', 'outputs/vacuum_ann.html')
-processArticle('inputs/washer_sentences.txt', 'outputs/washer_sentences.html', False)
+processArticle('inputs/blender_sentences.txt', 'outputs/blender_sentences.html', 'outputs/blender_sentences.txt', False)
+processArticle('inputs/drill_POS.txt',         'outputs/drill_POS.html',         'outputs/drill_POS.txt')
+processArticle('inputs/fridge_ann.txt',        'outputs/fridge_ann.html',        'outputs/fridge_ann.txt')
+processArticle('inputs/movies_ann.txt',        'outputs/movies_ann.html',        'outputs/movies_ann.txt')
+processArticle('inputs/vacuum_ann.txt',        'outputs/vacuum_ann.html',        'outputs/vacuum_ann.txt')
+processArticle('inputs/washer_sentences.txt',  'outputs/washer_sentences.html',  'outputs/washer_sentences.txt', False)
 
 printWordClasses('outputs/word_class.txt')
